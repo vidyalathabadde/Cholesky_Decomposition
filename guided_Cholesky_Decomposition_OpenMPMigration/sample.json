@@ -1,0 +1,22 @@
+{
+  "guid": "D739EAEB-568B-437B-B044-48A23DD9894A",
+  "name": "Cholesky_Decomposition",
+  "categories": ["Toolkit/oneAPI-samples/Tools/OpenACCToOpenMP"],
+  "description": "This openMP sample illustrates the read, write, update & capture clauses for the atomic directive",
+  "toolchain": [ "icx" ],
+  "dependencies": [ "compiler|icx","openmp" ],
+  "languages": [ { "c": { "properties": { "projectOptions": [ { "projectType": "makefile" } ] } } } ],
+  "targetDevice": [ "GPU" ],
+  "gpuRequired": ["pvc"],
+  "os": [ "linux" ],
+  "builder": [ "make" ],
+  "ciTests": {
+        "linux": [{
+                "steps": [
+                        "make",
+                        "make run"
+                 ]
+        }]
+  },
+  "expertise": "Concepts and Functionality"
+}

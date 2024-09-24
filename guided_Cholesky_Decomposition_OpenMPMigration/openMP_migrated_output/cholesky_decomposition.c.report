@@ -1,0 +1,38 @@
+* Line 48 contains the following statement
+#pragma acc parallel loop present(mat[0:N][0:N]) num_gangs(NG)
+that has been as been translated into:
+#pragma omp target teams loop map(present,alloc:mat[0:N][0:N])
+
+
+* Line 55 contains the following statement
+#pragma acc parallel loop present(mat[0:N][0:N]) num_gangs(NG)
+that has been as been translated into:
+#pragma omp target teams loop map(present,alloc:mat[0:N][0:N])
+
+
+* Line 63 contains the following statement
+#pragma acc parallel present(a[0:N][0:N]) num_gangs(NG)
+that has been as been translated into:
+#pragma omp target teams map(present,alloc:a[0:N][0:N])
+
+
+* Line 68 contains the following statement
+#pragma acc loop reduction(+:sm)
+that has been as been translated into:
+#pragma omp loop reduction(+:sm)
+
+
+* Line 75 contains the following statement
+#pragma acc loop reduction(+:sm)
+that has been as been translated into:
+#pragma omp loop reduction(+:sm)
+
+
+* Line 96 contains the following statement
+#pragma acc data create(a) copyin(sm) copyout(a[0:N][0:N])
+that has been as been translated into:
+#pragma omp target data map(to:sm) map(from:a[0:N][0:N]) map(alloc:a)
+* WARNING(s)! Please review the translation.
+  1. Potential mapping overlap between map(alloc:a) and map(from:a). Try to unify to avoid potential data mapping issues, for instance map(from:a).
+
+
