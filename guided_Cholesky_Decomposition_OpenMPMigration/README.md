@@ -1,10 +1,10 @@
-# `Atomic` Sample
+# `Cholesky_Decomposition` Sample
  
 This sample illustrates the read, write, update & capture clauses for the atomic directive. The original OpenACC source code is migrated to OpenMP to Offload on Intel® Platforms.
 
 | Area                  | Description
 |:---                       |:---
-| What you will learn       | Migrating and optimizing Atomic from OpenACC to OpenMP
+| What you will learn       | Migrating and optimizing Cholesky_Decomposition from OpenACC to OpenMP
 | Time to complete          | 15 minutes
 | Category                  | Concepts and Functionality
 
@@ -61,7 +61,7 @@ This sample demonstrates the migration of the following OpenACC pragmas:
 
 When working with the command-line interface (CLI), you should configure the oneAPI toolkits using environment variables. Set up your CLI environment by sourcing the `setvars` script every time you open a new terminal window. This practice ensures that the compiler, libraries, and tools are ready for development.
 
-## Migrate the `Atomic` Sample
+## Migrate the `Cholesky_Decomposition` Sample
 
 ### Migrate the Code using intel-application-migration-tool-for-openacc-to-openmp
 
@@ -76,11 +76,11 @@ The binary of the translator can be found inside intel-application-migration-too
     
   2. The openacc sample is taken from [Openacc-samples](https://github.com/OpenACC/openacc-examples.git)
      ```
-     cd openacc-examples/Submissions/C/Atomic/
+     cd openacc-examples/Submissions/C/Cholesky_Decomp/
      ```
   3. Now invoke the translator to migrate the openACC pragmas to OpenMP as shown below
      ```
-     intel-application-migration-tool-for-openacc-to-openmp/src/intel-application-migration-tool-for-openacc-to-openmp atomic.c
+     intel-application-migration-tool-for-openacc-to-openmp/src/intel-application-migration-tool-for-openacc-to-openmp cholesky_decomposition.c
      ```
 For each given input-file, the tool will generate a translation file named <input-file>.translated and will also dump a report with translation details into a file named <input-file>.report.
 
