@@ -1,6 +1,6 @@
 # `Cholesky_Decomposition` Sample
  
-This sample illustrates the read, write, update & capture clauses for the atomic directive. The original OpenACC source code is migrated to OpenMP to Offload on Intel® Platforms.
+This sample illustrates the  factorization of a matrix into a product of matrices. The original OpenACC source code is migrated to OpenMP to Offload on Intel® Platforms.
 
 | Area                  | Description
 |:---                       |:---
@@ -10,7 +10,7 @@ This sample illustrates the read, write, update & capture clauses for the atomic
 
 ## Purpose
 
-OpenMP atomic operations allows multiple threads to safely update a shared numeric variable, such as on hardware platforms that support atomic operation use. An atomic operation applies only to the single assignment statement that immediately follows it, so atomic operations are useful for code that requires fine-grain synchronization.
+The Cholesky decomposition of a Hermitian positive-definite matrix A is a decomposition of the form A = [L][L]T, where L is a lower triangular matrix with real and positive diagonal entries, and LT denotes the conjugate transpose of L. Every Hermitian positive-definite matrix (and thus also every real-valued symmetric positive-definite matrix) has a unique Cholesky decomposition.
 
 > **Note**: We use intel-application-migration-tool-for-openacc-to-openmp which assists developers in porting OpenACC code automatically to OpenMP code. 
 
@@ -33,26 +33,10 @@ For more information on how to install the above Tool, visit [intel-application-
 ## Key Implementation Details
 
 This sample demonstrates the migration of the following OpenACC pragmas: 
-- #pragma acc parallel loop copy() copyout()
 
-  The kernels construct identifies a region of code that may contain parallelism that has been as been translated into:
-  - #pragma omp target teams loop map(tofrom:) map(from:)
-- #pragma acc atomic read
-
-  The `atomic read` reads the value of a variable atomically. The value of a shared variable can be read safely, avoiding the danger of reading an intermediate value of the variable when it is accessed simultaneously by a concurrent thread. This has been translated into:
-  - #pragma omp atomic read
-- #pragma acc atomic write
-
-  The `atomic write` writes the value of a variable atomically. The value of a shared variable can be written exclusively to avoid errors from simultaneous writes. This has been translated into:
-  - #pragma omp atomic write
-- #pragma acc atomic update
-
-  The `atomic update` updates the value of a variable atomically. Allows only one thread to write to a shared variable at a time, avoiding errors from simultaneous writes to the same variable. This has been translated into:
-  - #pragma omp atomic update
-- #pragma acc atomic capture
-
-  The `atomic capture` updates the value of a variable while capturing the original or final value of the variable atomically. This has been translated into:
-  - #pragma omp atomic capture
+- #pragma acc parallel loop present() num_gangs()
+- #pragma acc loop reduction()
+- #pragma acc data create() copyin() copyout()
   
 
 >  **Note**: Refer to [Portability across Heterogeneous Architectures](https://www.intel.com/content/www/us/en/developer/articles/technical/openmp-accelerator-offload.html#gs.n33nuz) for general information about the migration of OpenACC to OpenMP.
@@ -84,7 +68,20 @@ The binary of the translator can be found inside intel-application-migration-too
      ```
 For each given input-file, the tool will generate a translation file named <input-file>.translated and will also dump a report with translation details into a file named <input-file>.report.
 
-## Build the `Atomic` Sample for GPU
+### Manual Workaround
+If we look at the generated report there is a warning which needs manual intervention to obtain correct results.
+> * WARNING(s)! Please review the translation.
+> 1. Potential mapping overlap between map(alloc:a) and map(from:a). Try to unify to avoid potential data mapping issues, for instance map(from:a).
+change the below line 
+```
+#pragma omp target data map(to:sm) map(from:a[0:N][0:N]) map(alloc:a)
+```
+to 
+```
+#pragma omp target data map(to:sm) map(from:a[0:N][0:N])
+```
+
+## Build the `Cholesky_Decomposition` Sample for GPU
 
 > **Note**: If you have not already done so, set up your CLI
 > environment by sourcing  the `setvars` script in the root of your oneAPI installation.
