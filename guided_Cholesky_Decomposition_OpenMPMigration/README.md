@@ -72,6 +72,7 @@ For each given input-file, the tool will generate a translation file named <inpu
 If we look at the generated report there is a warning which needs manual intervention to obtain correct results.
 > * WARNING(s)! Please review the translation.
 > 1. Potential mapping overlap between map(alloc:a) and map(from:a). Try to unify to avoid potential data mapping issues, for instance map(from:a).
+
 change the below line 
 ```
 #pragma omp target data map(to:sm) map(from:a[0:N][0:N]) map(alloc:a)
@@ -80,7 +81,10 @@ to
 ```
 #pragma omp target data map(to:sm) map(from:a[0:N][0:N])
 ```
-
+Also the num_gangs() in OpenACC is not translated to num_teams() in OpenMP, so add num_teams to the below line inside cholesky()
+```
+#pragma omp target teams loop map(present,alloc:a[0:N][0:N]) num_teams(NG)
+```
 ## Build the `Cholesky_Decomposition` Sample for GPU
 
 > **Note**: If you have not already done so, set up your CLI
