@@ -45,7 +45,6 @@ Further description and results can be found in the attached document.
 //               and other elements ii+jj (ii and jj being row and column indices respectively)
 // --> The choice of A is arbitrary. The size of A is N x N.
 void initmult(TYPE mat[][N]) {
-        #pragma acc parallel loop present(mat[0:N][0:N]) num_gangs(NG)
 #pragma omp target teams loop map(present,alloc:mat[0:N][0:N])
         for (int ii = 0; ii < N; ++ii) {
                 for (int jj = 0; jj < ii; ++jj)  {
@@ -53,7 +52,6 @@ void initmult(TYPE mat[][N]) {
               mat[jj][ii] = (ii+jj) / (float)N / N;
                         }
         }
-        #pragma acc parallel loop present(mat[0:N][0:N]) num_gangs(NG)
 #pragma omp target teams loop map(present,alloc:mat[0:N][0:N])
         for (int ii = 0; ii < N; ++ii)
         mat[ii][ii] = 1.0;
@@ -62,21 +60,17 @@ void initmult(TYPE mat[][N]) {
 // COMPUTING THE DECOMPOSITION (Done on the GPU)
 void cholesky(TYPE a[][N]) {
         double sm;
-        #pragma acc parallel present(a[0:N][0:N]) num_gangs(NG)
-#pragma omp target teams map(present,alloc:a[0:N][0:N])
+#pragma omp target teams loop map(present,alloc:a[0:N][0:N]) num_teams(NG)
         {
         for (int ii = 0; ii < N; ++ii) {
                 for (int jj = 0; jj < ii; ++jj) {
                         sm = a[ii][jj];
-                        #pragma acc loop reduction(+:sm)
 #pragma omp loop reduction(+:sm)
                         for (int kk = 0; kk < jj; ++kk)
                          { sm += -a[ii][kk] * a[jj][kk]; }
                         a[ii][jj] = sm/a[jj][jj];
                 }
                 sm = a[ii][ii];
-
-          #pragma acc loop reduction(+:sm)
 #pragma omp loop reduction(+:sm)
                 for (int kk = 0; kk < ii; ++kk)
                         { sm  += -a[ii][kk] * a[ii][kk]; }
@@ -98,19 +92,14 @@ void printMat(TYPE a[][N]) {
 
 int main() {
         TYPE a[N][N], sm;
-        #pragma acc data create(a) copyin(sm) copyout(a[0:N][0:N])
-#pragma omp target data map(to:sm) map(from:a[0:N][0:N]) map(alloc:a)
+#pragma omp target data map(to:sm) map(from:a[0:N][0:N])
         {
                 initmult(a);
                 StartTimer();
                 cholesky(a);
                 double runtime = GetTimer();
                 printf(" total: %f s\n", runtime / 1000.f);
-//              cholesky(a);
         }
         printMat(a);
         return 0;
 }
-
-// Code was translated using: /nfs/site/home/vbaddex/vidya/openacc/intel-application-migration-tool-for-openacc-to-openmp/src/intel-application-migration-tool-for-openacc-to-openmp -suppress-openacc
-
